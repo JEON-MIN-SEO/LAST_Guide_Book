@@ -21,6 +21,9 @@ public class UserEntity {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "line_user_id")
+    private String lineId;
+
     @Column(name = "provider")
     private ProviderEnums provider;
 }
