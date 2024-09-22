@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -22,7 +24,9 @@ public class DayEntity {
     @JoinColumn(name = "guidebook_id", nullable = false)
     private GuidebookEntity guidebook;
 
-    @Column(name = "content_json", columnDefinition = "TEXT")
-    private String contentJson; // JSON 형식의 콘텐츠 데이터를 저장
+    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<BookmarkEntity> bookmarks; // 각 날에 속하는 북마크 목록
 
+//    @Column(name = "content_json", columnDefinition = "TEXT")
+//    private String contentJson; // JSON 형식의 콘텐츠 데이터를 저장
 }

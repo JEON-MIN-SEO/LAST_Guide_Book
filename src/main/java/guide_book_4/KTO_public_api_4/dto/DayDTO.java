@@ -9,5 +9,5 @@ import java.util.List;
 @Setter
 public class DayDTO {
     private int dayNumber;   // 하루의 번호 (1, 2, 3...)
-    private List<String> contentIds;  // 하루의 콘텐츠 ID 리스트
+    private List<BookmarkDTO> contentId;  // 북마크 객체를 저장
 }

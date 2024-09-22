@@ -1,8 +1,11 @@
 package guide_book_4.KTO_public_api_4.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -23,4 +26,34 @@ public class BookmarkEntity {
 
     @Column(name = "content_id")
     private String contentId;
+
+    @Column(name = "contentType")
+    private int contenttype;
+
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "firstImage")
+    private String firstimage;
+
+    @Column(name = "firstImage2")
+    private String firstimage2;
+
+    @Column(name = "areaCode")
+    private String areacode;
+
+    @Column(name = "addr1")
+    private String addr1;
+
+    @Column(name = "tel")
+    private String tel;
+
+    @Column(name = "overview")
+    private String overview;
+
+    @Column(name = "eventStartDate")
+    private LocalDate eventstartdate;
+
+    @Column(name = "eventEndDate")
+    private LocalDate eventenddate;
 }

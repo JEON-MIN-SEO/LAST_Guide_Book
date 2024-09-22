@@ -60,6 +60,7 @@ public class GuidebookAPI {
         }
     }
 
+
     // 가이드북 삭제
     @DeleteMapping("/{guidebookId}")
     public ResponseEntity<ApiResponse<String>> deleteGuidebook(@PathVariable("guidebookId") Long guidebookId) {

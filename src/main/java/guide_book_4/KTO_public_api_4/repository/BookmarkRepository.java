@@ -14,5 +14,7 @@ public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> 
     List<BookmarkEntity> findAllByUserId(UserEntity user);
     // 유저와 콘텐츠 ID로 북마크를 조회
     Optional<BookmarkEntity> findByUserIdAndContentId(UserEntity user, String contentId);
+    // 컨텐츠 id로 bookmark 객체 찾기
+    List<BookmarkEntity> findByContentIdIn(List<String> contentIds);
 
 }

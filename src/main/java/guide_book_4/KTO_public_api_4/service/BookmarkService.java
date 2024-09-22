@@ -34,11 +34,23 @@ public class BookmarkService {
         //ある場合全てのBookmarkEntityを変換
         List<BookmarkEntity> bookmarks = bookmarkRepository.findAllByUserId(userEntity);
 
+        // 엔티티에서 Map<String, Object>로 변환하여 반환
         return bookmarks.stream()
                 .map(bookmark -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("contentId", bookmark.getContentId());
-                    return map;
+                    Map<String, Object> bookmarkMap = new HashMap<>();
+                    bookmarkMap.put("userId", bookmark.getUserId().getId());
+                    bookmarkMap.put("contentId", bookmark.getContentId());
+                    bookmarkMap.put("title", bookmark.getTitle());
+                    bookmarkMap.put("firstimage", bookmark.getFirstimage());
+                    bookmarkMap.put("firstimage2", bookmark.getFirstimage2());
+                    bookmarkMap.put("areacode", bookmark.getAreacode());
+                    bookmarkMap.put("addr1", bookmark.getAddr1());
+                    bookmarkMap.put("tel", bookmark.getTel());
+                    bookmarkMap.put("overview", bookmark.getOverview());
+                    bookmarkMap.put("eventstartdate", bookmark.getEventstartdate());
+                    bookmarkMap.put("eventenddate", bookmark.getEventenddate());
+                    bookmarkMap.put("contenttype", bookmark.getContenttype());
+                    return bookmarkMap;
                 })
                 .collect(Collectors.toList());
     }
@@ -55,16 +67,26 @@ public class BookmarkService {
                 .orElseThrow(() -> new CustomException(1005, "User not found")
                         //new IllegalArgumentException("User not found")
                 );
-        // ブックマーク作成
-        BookmarkEntity bookmarkEntity = new BookmarkEntity();
-        bookmarkEntity.setUserId(userEntity); // UserEntity 설정
-        bookmarkEntity.setContentId(bookmarkDTO.getContentId());
 
         // 重複検査またはユニークチェック
         if (bookmarkRepository.existsByUserIdAndContentId(userEntity, bookmarkDTO.getContentId())) {
             throw new CustomException(1006, "Bookmark already exists");
-            //throw new IllegalArgumentException("Bookmark already exists");
         }
+
+        // ブックマーク作成
+        BookmarkEntity bookmarkEntity = new BookmarkEntity();
+        bookmarkEntity.setUserId(userEntity); // UserEntity 설정
+        bookmarkEntity.setContentId(bookmarkDTO.getContentId());
+        bookmarkEntity.setTitle(bookmarkDTO.getTitle());
+        bookmarkEntity.setFirstimage(bookmarkDTO.getFirstimage());
+        bookmarkEntity.setFirstimage2(bookmarkDTO.getFirstimage2());
+        bookmarkEntity.setAreacode(bookmarkDTO.getAreacode());
+        bookmarkEntity.setAddr1(bookmarkDTO.getAddr1());
+        bookmarkEntity.setTel(bookmarkDTO.getTel());
+        bookmarkEntity.setOverview(bookmarkDTO.getOverview());
+        bookmarkEntity.setEventstartdate(bookmarkDTO.getEventstartdate());
+        bookmarkEntity.setEventenddate(bookmarkDTO.getEventenddate());
+        bookmarkEntity.setContenttype(bookmarkDTO.getContenttype());
 
         bookmarkRepository.save(bookmarkEntity);
     }

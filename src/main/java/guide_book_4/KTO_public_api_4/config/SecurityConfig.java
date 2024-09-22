@@ -89,7 +89,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/login", "/join").permitAll()
-                        .requestMatchers("/api/**","/apu/guidebook/**").authenticated()
+                        .requestMatchers("/api/**","/apu/guidebook/**","/api/guidebook/updateDays/**").authenticated()
                         .anyRequest().authenticated());
 
         http
