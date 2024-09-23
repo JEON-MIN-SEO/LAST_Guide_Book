@@ -56,4 +56,8 @@ public class BookmarkEntity {
 
     @Column(name = "eventEndDate")
     private LocalDate eventenddate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "day_id") // 외래 키 이름
+    private DayEntity day; // DayEntity와의 관계
 }

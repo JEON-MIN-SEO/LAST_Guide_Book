@@ -2,7 +2,6 @@ package guide_book_4.KTO_public_api_4.service;
 
 import guide_book_4.KTO_public_api_4.dto.UserDTO;
 import guide_book_4.KTO_public_api_4.entity.UserEntity;
-import guide_book_4.KTO_public_api_4.enums.ProviderEnums;
 import guide_book_4.KTO_public_api_4.error.CustomException;
 import guide_book_4.KTO_public_api_4.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,7 +36,6 @@ public class JoinService {
             UserEntity data = new UserEntity();
             data.setUsername(userDTO.getUsername());
             data.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
-            data.setProvider(ProviderEnums.LOCAL);
             userRepository.save(data);
         }
     }

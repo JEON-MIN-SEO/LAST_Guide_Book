@@ -61,23 +61,13 @@ public class GuidebookService {
     private DayDTO convertDayToDTO(DayEntity day) {
         DayDTO dto = new DayDTO();
         dto.setDayNumber(day.getDayNumber());
-        dto.setContentId(getBookmarksByContentIds(day.getContentJson())); // 변경된 부분
+        dto.setContents(day.getBookmarks().stream().map(this::convertToBookmarkDTO).collect(Collectors.toList()));
         return dto;
     }
 
-    public List<BookmarkDTO> getBookmarksByContentIds(String contentJson) {
-        List<String> contentIds = convertJsonToContentIds(contentJson); // JSON을 List<String>으로 변환
-        List<BookmarkEntity> bookmarks = bookmarkRepository.findByContentIdIn(contentIds);
-
-        return bookmarks.stream()
-                .map(this::convertToBookmarkDTO) // BookmarkEntity를 BookmarkDTO로 변환
-                .collect(Collectors.toList());
-    }
-
-
     private BookmarkDTO convertToBookmarkDTO(BookmarkEntity bookmark) {
         BookmarkDTO dto = new BookmarkDTO();
-        dto.setUserId(bookmark.getUserId() != null ? bookmark.getUserId().getId() : null); // UserEntity에서 userId 가져오기
+        dto.setUserId(bookmark.getUserId() != null ? bookmark.getUserId().getId() : null);
         dto.setContentId(bookmark.getContentId());
         dto.setContenttype(bookmark.getContenttype());
         dto.setTitle(bookmark.getTitle());
@@ -87,26 +77,31 @@ public class GuidebookService {
         dto.setAddr1(bookmark.getAddr1());
         dto.setTel(bookmark.getTel());
         dto.setOverview(bookmark.getOverview());
+        dto.setEventstartdate(bookmark.getEventstartdate());
+        dto.setEventenddate(bookmark.getEventenddate());
         return dto;
     }
 
     @Transactional
-    public void createGuidebook(GuidebookDTO guidebookDTO) {
+    public GuidebookDTO createGuidebook(GuidebookDTO guidebookDTO) {
         UserEntity user = userRepository.findById(guidebookDTO.getUserId())
                 .orElseThrow(() -> new CustomException(1005, "User not found"));
 
         GuidebookEntity guidebook = new GuidebookEntity();
+        guidebook.setUserId(user);
         guidebook.setTitle(guidebookDTO.getTitle());
         guidebook.setDestination(guidebookDTO.getDestination());
         guidebook.setStartDate(guidebookDTO.getStartDate());
         guidebook.setEndDate(guidebookDTO.getEndDate());
-        guidebook.setUserId(user);
 
-        guidebookRepository.save(guidebook);
+        GuidebookEntity savedGuidebook = guidebookRepository.save(guidebook);
 
-        // startDate와 endDate를 기반으로 DayEntity 생성
+        // 시작일과 종료일을 기준으로 DayEntity 생성
         createDaysForGuidebook(guidebook);
+
+        return convertToDTO(savedGuidebook);
     }
+
 
     //시작일과 종료일을 기준으로 DayEntity를 생성
     private void createDaysForGuidebook(GuidebookEntity guidebook) {
@@ -135,42 +130,59 @@ public class GuidebookService {
             DayEntity day = dayRepository.findByGuidebookAndDayNumber(guidebook, dayDTO.getDayNumber())
                     .orElseThrow(() -> new CustomException(1005, "Day not found"));
 
-//            day.setContentJson(convertContentIdsToJson(dayDTO.getContentIds()));
-//            dayRepository.save(day);
-            // Bookmark 객체의 contentId 목록을 JSON으로 변환
-            day.setContentJson(convertContentIdsToJson(dayDTO.getContentId().stream()
-                    .map(BookmarkDTO::getContentId)
-                    .collect(Collectors.toList())));
+            // Bookmark 객체 목록 자체를 저장
+            List<BookmarkEntity> bookmarks = dayDTO.getContents().stream()
+                    .map(bookmarkDTO -> convertToBookmarkEntity(bookmarkDTO, guidebook))
+                    .collect(Collectors.toList());
+            day.setBookmarks(bookmarks);
+
             dayRepository.save(day);
         }
     }
 
-    private String convertContentIdsToJson(List<String> contentIds) {
-        return String.join(",", contentIds);
+    private BookmarkEntity convertToBookmarkEntity(BookmarkDTO bookmarkDTO, GuidebookEntity guidebook) {
+        BookmarkEntity bookmarkEntity = new BookmarkEntity();
+
+        // userId를 통해 UserEntity를 가져와 설정
+        UserEntity user = userRepository.findById(bookmarkDTO.getUserId())
+                .orElseThrow(() -> new CustomException(1005, "User not found"));
+
+        bookmarkEntity.setUserId(user);
+
+        // DayEntity 설정
+        DayEntity day = dayRepository.findByGuidebookAndDayNumber(guidebook, bookmarkDTO.getDayNumber())
+                .orElseThrow(() -> new CustomException(1005, "Day not found"));
+        bookmarkEntity.setDay(day);
+
+        // 필요한 필드들을 DTO에서 Entity로 변환
+        bookmarkEntity.setContentId(bookmarkDTO.getContentId());
+        bookmarkEntity.setContenttype(bookmarkDTO.getContenttype());
+        bookmarkEntity.setTitle(bookmarkDTO.getTitle());
+        bookmarkEntity.setFirstimage(bookmarkDTO.getFirstimage());
+        bookmarkEntity.setFirstimage2(bookmarkDTO.getFirstimage2());
+        bookmarkEntity.setAreacode(bookmarkDTO.getAreacode());
+        bookmarkEntity.setAddr1(bookmarkDTO.getAddr1());
+        bookmarkEntity.setTel(bookmarkDTO.getTel());
+        bookmarkEntity.setOverview(bookmarkDTO.getOverview());
+        bookmarkEntity.setEventstartdate(bookmarkDTO.getEventstartdate());
+        bookmarkEntity.setEventenddate(bookmarkDTO.getEventenddate());
+
+        return bookmarkEntity;
     }
 
-    @Transactional(readOnly = true)
-    public GuidebookDTO getGuidebookById(Long guidebookId) {
-        GuidebookEntity guidebook = guidebookRepository.findById(guidebookId)
-                .orElseThrow(() -> new CustomException(1005, "Guidebook not found"));
 
-        GuidebookDTO guidebookDTO = convertToDTO(guidebook);
-        List<DayEntity> dayEntities = dayRepository.findByGuidebook(guidebook);
-        List<DayDTO> dayDTOs = dayEntities.stream()
-                .map(this::convertDayToDTO)
-                .collect(Collectors.toList());
 
-        guidebookDTO.setDays(dayDTOs);
-        return guidebookDTO;
-    }
+//    private String convertContentIdsToJson(List<String> contentIds) {
+//        return String.join(",", contentIds);
+//    }
 
     // JSON 문자열을 List<String>으로 변환
-    private List<String> convertJsonToContentIds(String contentJson) {
-        if (contentJson == null || contentJson.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return new ArrayList<>(Arrays.asList(contentJson.split(",")));
-    }
+//    private List<String> convertJsonToContentIds(String contentJson) {
+//        if (contentJson == null || contentJson.isEmpty()) {
+//            return new ArrayList<>();
+//        }
+//        return new ArrayList<>(Arrays.asList(contentJson.split(",")));
+//    }
 
     @Transactional
     public void deleteGuidebook(Long guidebookId) {

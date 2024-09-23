@@ -22,7 +22,7 @@ public class GuidebookAPI {
     }
 
     // 사용자가 만든 모든 가이드북 조회
-    @GetMapping("{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<List<GuidebookDTO>>> getGuidebooksByUserId(@PathVariable("userId") Long userId) {
         try {
             List<GuidebookDTO> guidebooks = guidebookService.getGuidebooksByUserId(userId);
@@ -59,7 +59,6 @@ public class GuidebookAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
-
 
     // 가이드북 삭제
     @DeleteMapping("/{guidebookId}")

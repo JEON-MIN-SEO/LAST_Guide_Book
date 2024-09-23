@@ -35,4 +35,6 @@ public class BookmarkDTO {
 
     @JsonFormat(pattern = "yyyyMMdd")
     private LocalDate eventenddate;
+
+    private int dayNumber;
 }

@@ -1,6 +1,5 @@
 package guide_book_4.KTO_public_api_4.entity;
 
-import guide_book_4.KTO_public_api_4.enums.ProviderEnums;
 import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.*;
@@ -20,10 +19,4 @@ public class UserEntity {
 
     @Column(name = "password")
     private String password;
-
-    @Column(name = "line_user_id")
-    private String lineId;
-
-    @Column(name = "provider")
-    private ProviderEnums provider;
 }
