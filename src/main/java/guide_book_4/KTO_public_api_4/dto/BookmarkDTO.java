@@ -10,6 +10,8 @@ import java.time.LocalDate;
 @Setter
 public class BookmarkDTO {
 
+    private Long id;
+
     private Long userId;
 
     private String contentId;
@@ -35,6 +37,4 @@ public class BookmarkDTO {
 
     @JsonFormat(pattern = "yyyyMMdd")
     private LocalDate eventenddate;
-
-    private int dayNumber;
 }

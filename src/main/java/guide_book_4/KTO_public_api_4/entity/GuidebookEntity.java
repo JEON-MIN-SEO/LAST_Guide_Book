@@ -34,7 +34,7 @@ public class GuidebookEntity {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @OneToMany(mappedBy = "guidebook", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DayEntity> days = new ArrayList<>();
+    @OneToMany(mappedBy = "guidebook", cascade = CascadeType.ALL)
+    private List<DayEntity> days;
 }
 

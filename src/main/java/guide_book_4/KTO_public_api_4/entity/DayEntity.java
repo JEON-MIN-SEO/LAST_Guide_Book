@@ -17,16 +17,19 @@ public class DayEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "day_number", nullable = false)
     private int dayNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guidebook_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "guidebook_id")
     private GuidebookEntity guidebook;
 
-    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<BookmarkEntity> bookmarks; // 각 날에 속하는 북마크 목록
+    @ManyToMany
+    @JoinTable(
+            name = "day_bookmark",
+            joinColumns = @JoinColumn(name = "day_id"),
+            inverseJoinColumns = @JoinColumn(name = "bookmark_id"))
+    private List<BookmarkEntity> bookmarks;
+}
 
 //    @Column(name = "content_json", columnDefinition = "TEXT")
 //    private String contentJson; // JSON 형식의 콘텐츠 데이터를 저장
-}
