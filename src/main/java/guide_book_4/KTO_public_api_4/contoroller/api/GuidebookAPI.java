@@ -21,11 +21,11 @@ public class GuidebookAPI {
         this.guidebookService = guidebookService;
     }
 
-    // 사용자가 만든 모든 가이드북 조회
+    // 1. 가이드북 전체 조회
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<List<GuidebookDTO>>> getGuidebooksByUserId(@PathVariable("userId") Long userId) {
+    public ResponseEntity<ApiResponse<List<GuidebookDTO>>> getAllGuidebooks(@PathVariable Long userId) {
         try {
-            List<GuidebookDTO> guidebooks = guidebookService.getGuidebooksByUserId(userId);
+            List<GuidebookDTO> guidebooks = guidebookService.getAllGuidebooks(userId);
             ApiResponse<List<GuidebookDTO>> response = new ApiResponse<>(guidebooks);
             return ResponseEntity.ok(response);
         } catch (CustomException e) {
@@ -34,7 +34,20 @@ public class GuidebookAPI {
         }
     }
 
-    // 가이드북 생성
+    // 2. 가이드북 상세 조회
+    @GetMapping("/{guidebookId}/full")
+    public ResponseEntity<ApiResponse<GuidebookDTO>> getFullGuidebook(@PathVariable Long guidebookId) {
+        try {
+            GuidebookDTO guidebook = guidebookService.getFullGuidebook(guidebookId);
+            ApiResponse<GuidebookDTO> response = new ApiResponse<>(guidebook);
+            return ResponseEntity.ok(response);
+        } catch (CustomException e) {
+            ApiResponse<GuidebookDTO> errorResponse = new ApiResponse<>(e.getErrorCode(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
+    // 3. 가이드북 생성
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<String>> createGuidebook(@RequestBody GuidebookDTO guidebookDTO) {
         try {
@@ -47,11 +60,11 @@ public class GuidebookAPI {
         }
     }
 
-    // 일정 추가
+    // 4. 일정 추가
     @PostMapping("/{guidebookId}/updateDays")
-    public ResponseEntity<ApiResponse<String>> updateDaysInGuidebook(@PathVariable("guidebookId") Long guidebookId, @RequestBody List<DayDTO> dayDTOs) {
+    public ResponseEntity<ApiResponse<String>> updateDays(@PathVariable Long guidebookId, @RequestBody List<DayDTO> days) {
         try {
-            guidebookService.updateDaysInGuidebook(guidebookId, dayDTOs);
+            guidebookService.updateDays(guidebookId, days);
             ApiResponse<String> response = new ApiResponse<>("Days updated successfully");
             return ResponseEntity.ok(response);
         } catch (CustomException e) {
@@ -60,9 +73,9 @@ public class GuidebookAPI {
         }
     }
 
-    // 가이드북 삭제
+    // 5. 가이드북 삭제
     @DeleteMapping("/{guidebookId}")
-    public ResponseEntity<ApiResponse<String>> deleteGuidebook(@PathVariable("guidebookId") Long guidebookId) {
+    public ResponseEntity<ApiResponse<String>> deleteGuidebook(@PathVariable Long guidebookId) {
         try {
             guidebookService.deleteGuidebook(guidebookId);
             ApiResponse<String> response = new ApiResponse<>("Guidebook deleted successfully");

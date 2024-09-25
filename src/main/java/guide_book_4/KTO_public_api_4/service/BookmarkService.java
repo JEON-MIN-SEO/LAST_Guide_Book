@@ -25,52 +25,19 @@ public class BookmarkService {
         this.userRepository = userRepository;
     }
 
-    //ユーザーidでボックマークの全てを読み込む
-    public List<Map<String, Object>> getBookmarksByUserId(Long userId) {
-        //findByIdを利用してユーザーがあるかを先に検査
-        UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException( 1007, "User not found"));
-
-        //ある場合全てのBookmarkEntityを変換
-        List<BookmarkEntity> bookmarks = bookmarkRepository.findAllByUserId(userEntity);
-
-        // 엔티티에서 Map<String, Object>로 변환하여 반환
-        return bookmarks.stream()
-                .map(bookmark -> {
-                    Map<String, Object> bookmarkMap = new HashMap<>();
-                    bookmarkMap.put("userId", bookmark.getUserId().getId());
-                    bookmarkMap.put("contentId", bookmark.getContentId());
-                    bookmarkMap.put("title", bookmark.getTitle());
-                    bookmarkMap.put("firstimage", bookmark.getFirstimage());
-                    bookmarkMap.put("firstimage2", bookmark.getFirstimage2());
-                    bookmarkMap.put("areacode", bookmark.getAreacode());
-                    bookmarkMap.put("addr1", bookmark.getAddr1());
-                    bookmarkMap.put("tel", bookmark.getTel());
-                    bookmarkMap.put("overview", bookmark.getOverview());
-                    bookmarkMap.put("eventstartdate", bookmark.getEventstartdate());
-                    bookmarkMap.put("eventenddate", bookmark.getEventenddate());
-                    bookmarkMap.put("contenttype", bookmark.getContenttype());
-                    return bookmarkMap;
-                })
-                .collect(Collectors.toList());
-    }
-
     public void addBookmark(BookmarkDTO bookmarkDTO) {
         // 有効性検査:空値であることを確認
-        if (bookmarkDTO.getUserId() == null || bookmarkDTO.getContentId() == null) {
-            throw new CustomException(1004, "User ID and Content ID must not be null");
-            //throw new IllegalArgumentException("User ID and Content ID must not be null");
+        if (bookmarkDTO.getUserId() == null) {
+            throw new CustomException(1000, "User ID and Content ID must not be null");
         }
 
         // UserEntityからユーザーを確認
         UserEntity userEntity = userRepository.findById(bookmarkDTO.getUserId())
-                .orElseThrow(() -> new CustomException(1005, "User not found")
-                        //new IllegalArgumentException("User not found")
-                );
+                .orElseThrow(() -> new CustomException(1001, "User not found"));
 
         // 重複検査またはユニークチェック
         if (bookmarkRepository.existsByUserIdAndContentId(userEntity, bookmarkDTO.getContentId())) {
-            throw new CustomException(1006, "Bookmark already exists");
+            throw new CustomException(1003, "Bookmark already exists");
         }
 
         // ブックマーク作成
@@ -91,16 +58,55 @@ public class BookmarkService {
         bookmarkRepository.save(bookmarkEntity);
     }
 
+
     public void deleteBookmark(Long userId, String contentId) {
         // 유저와 북마크가 존재하는지 확인
-        UserEntity userEntity = userRepository.findById(userId)
+        UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(1001, "User not found"));
 
-        BookmarkEntity bookmarkEntity = bookmarkRepository.findByUserIdAndContentId(userEntity, contentId)
+        BookmarkEntity bookmarkEntity = bookmarkRepository.findByUserIdAndContentId(user.getId(), contentId)
                 .orElseThrow(() -> new CustomException(1002, "Bookmark not found"));
 
         // 북마크 삭제
         bookmarkRepository.delete(bookmarkEntity);
+    }
+
+    // 특정 유저의 모든 북마크 조회
+    public List<BookmarkDTO> getUserBookmarks(Long userId) {
+        // 유저와 북마크가 존재하는지 확인
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(1001, "User not found"));
+
+        return bookmarkRepository.findByUserId(userId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // 특정 가이드북에 있는 북마크 조회
+    public List<BookmarkDTO> getGuidebookBookmarks(Long guidebookId) {
+        return bookmarkRepository.findByGuidebookId(guidebookId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // 엔티티를 DTO로 변환
+    private BookmarkDTO convertToDTO(BookmarkEntity bookmarkEntity) {
+        BookmarkDTO bookmarkDTO = new BookmarkDTO();
+        bookmarkDTO.setId(bookmarkEntity.getId());
+        bookmarkDTO.setUserId(bookmarkEntity.getUserId().getId());
+        bookmarkDTO.setContentId(bookmarkEntity.getContentId());
+        bookmarkDTO.setTitle(bookmarkEntity.getTitle());
+        bookmarkDTO.setFirstimage(bookmarkEntity.getFirstimage());
+        bookmarkDTO.setFirstimage2(bookmarkEntity.getFirstimage2());
+        bookmarkDTO.setAreacode(bookmarkEntity.getAreacode());
+        bookmarkDTO.setAddr1(bookmarkEntity.getAddr1());
+        bookmarkDTO.setContenttype(bookmarkEntity.getContenttype());
+        bookmarkDTO.setTel(bookmarkEntity.getTel());
+        bookmarkDTO.setEventstartdate(bookmarkEntity.getEventstartdate());
+        bookmarkDTO.setEventenddate(bookmarkEntity.getEventenddate());
+        bookmarkDTO.setOverview(bookmarkEntity.getOverview());
+
+        return bookmarkDTO;
     }
 }
 

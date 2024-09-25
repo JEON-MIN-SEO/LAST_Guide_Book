@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 //CRUD 「作成（Create）」「読み出し（Read）」「更新（Update）」「削除（Delete）」
 @RestController
@@ -22,16 +21,15 @@ public class BookmarkAPI {
         this.bookmarkService = bookmarkService;
     }
 
-    // ユーザーIDでブックマークリスト照会(しょうかい, 조회）
+    // 특정 유저의 모든 북마크 조회
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getBookmarksByUserId(@PathVariable("userId") Long userId) {
-        //@PathVariable("userId")이걸 왜 지정해야 하는지 찾아보기 맵핑이 안되는지 확인
+    public ResponseEntity<ApiResponse<List<BookmarkDTO>>> getUserBookmarks(@PathVariable Long userId) {
         try {
-            List<Map<String, Object>> bookmarks = bookmarkService.getBookmarksByUserId(userId);
-            ApiResponse<List<Map<String, Object>>> response = new ApiResponse<>(bookmarks);
+            List<BookmarkDTO> bookmarks = bookmarkService.getUserBookmarks(userId);
+            ApiResponse<List<BookmarkDTO>> response = new ApiResponse<>(bookmarks);
             return ResponseEntity.ok(response);
         } catch (CustomException e) {
-            ApiResponse<List<Map<String, Object>>> errorResponse = new ApiResponse<>(e.getErrorCode(), e.getMessage());
+            ApiResponse<List<BookmarkDTO>> errorResponse = new ApiResponse<>(e.getErrorCode(), e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
@@ -46,11 +44,6 @@ public class BookmarkAPI {
             ApiResponse<String> errorResponse = new ApiResponse<>(e.getErrorCode(), e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
-        /* 基本エラー勝利コード
-        catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-        */
     }
 
     @DeleteMapping("/delete")
@@ -64,4 +57,24 @@ public class BookmarkAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
+
+    // 특정 가이드북에 있는 북마크 조회
+    @GetMapping("/guidebook/{guidebookId}")
+    public ResponseEntity<ApiResponse<List<BookmarkDTO>>> getGuidebookBookmarks(@PathVariable Long guidebookId) {
+        try {
+            List<BookmarkDTO> bookmarks = bookmarkService.getGuidebookBookmarks(guidebookId);
+            ApiResponse<List<BookmarkDTO>> response = new ApiResponse<>(bookmarks);
+            return ResponseEntity.ok(response);
+        } catch (CustomException e) {
+            ApiResponse<List<BookmarkDTO>> errorResponse = new ApiResponse<>(e.getErrorCode(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
 }
+
+
+        /* 基本エラー勝利コード
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        */
