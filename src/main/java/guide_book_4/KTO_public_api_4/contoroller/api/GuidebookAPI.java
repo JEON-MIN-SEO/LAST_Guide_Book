@@ -23,7 +23,7 @@ public class GuidebookAPI {
 
     // 1. 가이드북 전체 조회
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<List<GuidebookDTO>>> getAllGuidebooks(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<List<GuidebookDTO>>> getAllGuidebooks(@PathVariable("userId") Long userId) {
         try {
             List<GuidebookDTO> guidebooks = guidebookService.getAllGuidebooks(userId);
             ApiResponse<List<GuidebookDTO>> response = new ApiResponse<>(guidebooks);

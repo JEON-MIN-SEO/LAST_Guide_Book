@@ -11,15 +11,15 @@ import java.util.Optional;
 
 public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> {
     // 사용자 ID와 콘텐츠 ID로 중복 여부 확인
-    boolean existsByUserIdAndContentId(UserEntity user, String contentId);
+    boolean existsByUserIdAndContentId(UserEntity userId, String contentId);
 
     // 특정 유저의 북마크 리스트 가져오기
-    List<BookmarkEntity> findByUserId(Long userId);
+    List<BookmarkEntity> findByUserId(UserEntity userId);
 
     // 특정 가이드북에 있는 북마크 리스트 가져오기
-    @Query("SELECT b FROM BookmarkEntity b JOIN b.days d WHERE d.guidebook.id = :guidebookId")
-    List<BookmarkEntity> findByGuidebookId(@Param("guidebookId") Long guidebookId);
+    //@Query("SELECT b FROM BookmarkEntity b WHERE b.guidebook.id = :guidebookId")
+    //List<BookmarkEntity> findByGuidebookId(@Param("guidebookId") Long guidebookId);
 
-    // 특정 유저의 특정 콘텐츠 북마크 찾기
-    Optional<BookmarkEntity> findByUserIdAndContentId(UserEntity userId, String contentId);
+    // 유저와 콘텐츠 ID로 북마크를 조회
+    Optional<BookmarkEntity> findByUserIdAndContentId(UserEntity user, String contentId);
 }

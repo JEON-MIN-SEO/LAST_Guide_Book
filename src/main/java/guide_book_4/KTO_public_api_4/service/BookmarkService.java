@@ -9,9 +9,7 @@ import guide_book_4.KTO_public_api_4.repository.BookmarkRepository;
 import guide_book_4.KTO_public_api_4.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service//ブックマークについてのサービス
@@ -27,18 +25,14 @@ public class BookmarkService {
 
     public void addBookmark(BookmarkDTO bookmarkDTO) {
         // 有効性検査:空値であることを確認
-        if (bookmarkDTO.getUserId() == null) {
-            throw new CustomException(1000, "User ID and Content ID must not be null");
+        if (bookmarkDTO.getUserId() == null || bookmarkDTO.getContentId() == null) {
+            throw new CustomException(1006, "User ID and Content ID must not be null");
+            //throw new IllegalArgumentException("User ID and Content ID must not be null");
         }
 
         // UserEntityからユーザーを確認
         UserEntity userEntity = userRepository.findById(bookmarkDTO.getUserId())
                 .orElseThrow(() -> new CustomException(1001, "User not found"));
-
-        // 重複検査またはユニークチェック
-        if (bookmarkRepository.existsByUserIdAndContentId(userEntity, bookmarkDTO.getContentId())) {
-            throw new CustomException(1003, "Bookmark already exists");
-        }
 
         // ブックマーク作成
         BookmarkEntity bookmarkEntity = new BookmarkEntity();
@@ -55,16 +49,22 @@ public class BookmarkService {
         bookmarkEntity.setEventenddate(bookmarkDTO.getEventenddate());
         bookmarkEntity.setContenttype(bookmarkDTO.getContenttype());
 
+        // 重複検査またはユニークチェック
+        if (bookmarkRepository.existsByUserIdAndContentId(userEntity, bookmarkDTO.getContentId())) {
+            throw new CustomException(1006, "Bookmark already exists");
+            //throw new IllegalArgumentException("Bookmark already exists");
+        }
+
         bookmarkRepository.save(bookmarkEntity);
     }
 
 
     public void deleteBookmark(Long userId, String contentId) {
         // 유저와 북마크가 존재하는지 확인
-        UserEntity user = userRepository.findById(userId)
+        UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(1001, "User not found"));
 
-        BookmarkEntity bookmarkEntity = bookmarkRepository.findByUserIdAndContentId(user.getId(), contentId)
+        BookmarkEntity bookmarkEntity = bookmarkRepository.findByUserIdAndContentId(userEntity, contentId)
                 .orElseThrow(() -> new CustomException(1002, "Bookmark not found"));
 
         // 북마크 삭제
@@ -77,17 +77,17 @@ public class BookmarkService {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(1001, "User not found"));
 
-        return bookmarkRepository.findByUserId(userId).stream()
+        return bookmarkRepository.findByUserId(userEntity).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-
-    // 특정 가이드북에 있는 북마크 조회
-    public List<BookmarkDTO> getGuidebookBookmarks(Long guidebookId) {
-        return bookmarkRepository.findByGuidebookId(guidebookId).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
+//
+//    // 특정 가이드북에 있는 북마크 조회
+//    public List<BookmarkDTO> getGuidebookBookmarks(Long guidebookId) {
+//        return bookmarkRepository.findByGuidebookId(guidebookId).stream()
+//                .map(this::convertToDTO)
+//                .collect(Collectors.toList());
+//    }
 
     // 엔티티를 DTO로 변환
     private BookmarkDTO convertToDTO(BookmarkEntity bookmarkEntity) {
