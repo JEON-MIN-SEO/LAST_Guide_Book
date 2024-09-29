@@ -14,5 +14,7 @@ public class DayDTO {
 
     private int dayNumber;
 
+    private List<Long> bookmarkIds;
+
     private List<BookmarkDTO> bookmarks;
 }

@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface GuidebookRepository extends JpaRepository<GuidebookEntity, Long> {
-    List<GuidebookEntity> findByUserId(UserEntity user);
-
-    //List<GuidebookEntity> findAllByUserId(Long userId);
+    // 사용자 ID로 가이드북 조회 (UserEntity로 변경)
+    List<GuidebookEntity> findAllByUserId(UserEntity userId);
 }

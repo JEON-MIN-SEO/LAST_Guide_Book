@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,13 +37,16 @@ public class GuidebookService {
         this.userRepository = userRepository;
     }
 
-    // 1. 가이드북 전체 조회
+    // 1. 가이드북 조회
     public List<GuidebookDTO> getAllGuidebooks(Long userId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(1001, "User not found"));
+        // UserEntity를 가져오거나, 필요한 경우 Repository를 통해 조회
+        UserEntity user = new UserEntity(); // 혹은 userId를 통해 DB에서 UserEntity를 조회
+        user.setId(userId); // userId 설정
 
-        List<GuidebookEntity> guidebooks = guidebookRepository.findByUserId(user);
-        return guidebooks.stream().map(this::convertToDTO).collect(Collectors.toList());
+        List<GuidebookEntity> guidebooks = guidebookRepository.findAllByUserId(user);
+        return guidebooks.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     private GuidebookDTO convertToDTO(GuidebookEntity guidebook) {
@@ -52,7 +56,8 @@ public class GuidebookService {
         dto.setDestination(guidebook.getDestination());
         dto.setStartDate(guidebook.getStartDate());
         dto.setEndDate(guidebook.getEndDate());
-        dto.setDays(guidebook.getDays().stream().map(this::convertDayToDTO).collect(Collectors.toList()));
+        dto.setUserId(guidebook.getUserId().getId());
+
         return dto;
     }
 
@@ -61,14 +66,23 @@ public class GuidebookService {
         GuidebookEntity guidebook = guidebookRepository.findById(guidebookId)
                 .orElseThrow(() -> new CustomException(1003, "Guidebook not found"));
 
+        // 가이드북 엔티티를 DTO로 변환
         return convertToFullDTO(guidebook);
     }
 
     private GuidebookDTO convertToFullDTO(GuidebookEntity guidebook) {
-        GuidebookDTO dto = convertToDTO(guidebook);
+        GuidebookDTO dto = new GuidebookDTO();
+        dto.setId(guidebook.getId());
+        dto.setTitle(guidebook.getTitle());
+        dto.setDestination(guidebook.getDestination());
+        dto.setStartDate(guidebook.getStartDate());
+        dto.setEndDate(guidebook.getEndDate());
         dto.setUserId(guidebook.getUserId().getId());
 
-        List<DayDTO> dayDTOs = guidebook.getDays().stream().map(this::convertDayToDTO).collect(Collectors.toList());
+        // DayEntity를 DayDTO로 변환
+        List<DayDTO> dayDTOs = guidebook.getDays().stream()
+                .map(this::convertDayToDTO)
+                .collect(Collectors.toList());
         dto.setDays(dayDTOs);
 
         return dto;
@@ -79,9 +93,12 @@ public class GuidebookService {
         dayDTO.setId(day.getId());
         dayDTO.setDayNumber(day.getDayNumber());
 
-        List<BookmarkDTO> bookmarkDTOs = day.getBookmarks().stream().map(this::convertBookmarkToDTO).collect(Collectors.toList());
-        dayDTO.setBookmarks(bookmarkDTOs);
+        // 북마크 ID로 북마크 정보를 가져오고 DTO로 변환
+        List<BookmarkDTO> bookmarkDTOs = day.getBookmarks().stream()
+                .map(bookmark -> convertBookmarkToDTO(bookmark))
+                .collect(Collectors.toList());
 
+        dayDTO.setBookmarks(bookmarkDTOs);
         return dayDTO;
     }
 
@@ -101,6 +118,7 @@ public class GuidebookService {
         dto.setOverview(bookmark.getOverview());
         return dto;
     }
+
 
     // 3. 가이드북 생성 (시작일과 종료일을 기준으로 DayEntity를 생성)
     @Transactional
@@ -136,39 +154,34 @@ public class GuidebookService {
         }
     }
 
-    // 4. 일정 추가
+    // 일정 추가 기능
     @Transactional
     public void updateDays(Long guidebookId, List<DayDTO> days) {
         GuidebookEntity guidebook = guidebookRepository.findById(guidebookId)
                 .orElseThrow(() -> new CustomException(1003, "Guidebook not found"));
 
         for (DayDTO dayDTO : days) {
-            // 기존 DayEntity가 존재하는지 확인
+            // bookmarkIds가 null인 경우 빈 리스트로 초기화
+            if (dayDTO.getBookmarkIds() == null) {
+                dayDTO.setBookmarkIds(new ArrayList<>()); // bookmarkIds 초기화
+            }
+
             DayEntity dayEntity = dayRepository.findByGuidebookAndDayNumber(guidebook, dayDTO.getDayNumber())
                     .orElseGet(() -> {
-                        // 존재하지 않으면 새로 생성
                         DayEntity newDayEntity = new DayEntity();
                         newDayEntity.setDayNumber(dayDTO.getDayNumber());
                         newDayEntity.setGuidebook(guidebook);
                         return newDayEntity;
                     });
 
-            // 북마크 ID를 추출하는 로직 추가
-            List<Long> bookmarkIds = dayDTO.getBookmarks().stream()
-                    .map(BookmarkDTO::getId)  // BookmarkDTO에서 id (bookmarkId)를 추출
-                    .collect(Collectors.toList());
-
-            // 추출한 bookmarkIds로 북마크 목록 가져오기
-            List<BookmarkEntity> bookmarks = bookmarkRepository.findAllById(bookmarkIds);
-
-
-            // 기존 북마크 정보를 업데이트
+            // bookmarkIds를 사용하여 BookmarkEntity를 가져온다
+            List<BookmarkEntity> bookmarks = bookmarkRepository.findAllById(dayDTO.getBookmarkIds());
             dayEntity.setBookmarks(bookmarks);
-
-            // DayEntity 저장 (새로 추가된 DayEntity도 자동으로 저장됨)
             dayRepository.save(dayEntity);
         }
     }
+
+
 
 
     // 5. 가이드북 삭제

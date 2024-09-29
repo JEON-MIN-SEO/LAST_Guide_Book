@@ -36,7 +36,7 @@ public class GuidebookAPI {
 
     // 2. 가이드북 상세 조회
     @GetMapping("/{guidebookId}/full")
-    public ResponseEntity<ApiResponse<GuidebookDTO>> getFullGuidebook(@PathVariable Long guidebookId) {
+    public ResponseEntity<ApiResponse<GuidebookDTO>> getFullGuidebook(@PathVariable("guidebookId") Long guidebookId) {
         try {
             GuidebookDTO guidebook = guidebookService.getFullGuidebook(guidebookId);
             ApiResponse<GuidebookDTO> response = new ApiResponse<>(guidebook);
@@ -62,7 +62,7 @@ public class GuidebookAPI {
 
     // 4. 일정 추가
     @PostMapping("/{guidebookId}/updateDays")
-    public ResponseEntity<ApiResponse<String>> updateDays(@PathVariable Long guidebookId, @RequestBody List<DayDTO> days) {
+    public ResponseEntity<ApiResponse<String>> updateDays(@PathVariable("guidebookId") Long guidebookId, @RequestBody List<DayDTO> days) {
         try {
             guidebookService.updateDays(guidebookId, days);
             ApiResponse<String> response = new ApiResponse<>("Days updated successfully");

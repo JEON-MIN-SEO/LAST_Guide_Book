@@ -1,13 +1,17 @@
 package guide_book_4.KTO_public_api_4.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@NoArgsConstructor // 기본 생성자
+@AllArgsConstructor // 모든 필드를 포함하는 생성자
 public class BookmarkDTO {
 
     private Long id;
@@ -36,5 +40,5 @@ public class BookmarkDTO {
     private LocalDate eventstartdate;
 
     @JsonFormat(pattern = "yyyyMMdd")
-        private LocalDate eventenddate;
+    private LocalDate eventenddate;
 }
