@@ -183,9 +183,6 @@ public class GuidebookService {
         }
     }
 
-
-
-
     // 5. 가이드북 삭제
     @Transactional
     public void deleteGuidebook(Long guidebookId) {

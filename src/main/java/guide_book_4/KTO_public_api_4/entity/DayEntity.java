@@ -23,7 +23,7 @@ public class DayEntity {
     @JoinColumn(name = "guidebook_id")
     private GuidebookEntity guidebook;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})//day_bookmark 삭제 하면 다 삭제
     @JoinTable(
             name = "day_bookmark",
             joinColumns = @JoinColumn(name = "day_id"),

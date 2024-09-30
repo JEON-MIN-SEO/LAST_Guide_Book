@@ -1,11 +1,11 @@
 package guide_book_4.KTO_public_api_4.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -55,4 +55,8 @@ public class BookmarkEntity {
 
     @Column(name = "eventEndDate")
     private LocalDate eventenddate;
+
+    //day_bookmark 삭제 하면 다 삭제
+    @ManyToMany(mappedBy = "bookmarks", cascade = CascadeType.REMOVE)  // 북마크 삭제 시 day_bookmark도 삭제
+    private List<DayEntity> days;  // DayEntity와의 관계
 }
