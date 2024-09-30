@@ -57,6 +57,6 @@ public class BookmarkEntity {
     private LocalDate eventenddate;
 
     //day_bookmark 삭제 하면 다 삭제
-    @ManyToMany(mappedBy = "bookmarks", cascade = CascadeType.REMOVE)  // 북마크 삭제 시 day_bookmark도 삭제
-    private List<DayEntity> days;  // DayEntity와의 관계
+//    @ManyToMany(mappedBy = "bookmarks", cascade = CascadeType.REMOVE)  // 북마크 삭제 시 day_bookmark도 삭제
+//    private List<DayEntity> days;  // DayEntity와의 관계
 }

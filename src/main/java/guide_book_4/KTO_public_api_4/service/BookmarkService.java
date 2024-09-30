@@ -6,7 +6,7 @@ import guide_book_4.KTO_public_api_4.entity.BookmarkEntity;
 import guide_book_4.KTO_public_api_4.entity.UserEntity;
 import guide_book_4.KTO_public_api_4.error.CustomException;
 import guide_book_4.KTO_public_api_4.repository.BookmarkRepository;
-import guide_book_4.KTO_public_api_4.repository.DayBookmarkRepository;
+//import guide_book_4.KTO_public_api_4.repository.DayBookmarkRepository;
 import guide_book_4.KTO_public_api_4.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +18,12 @@ public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
-    private final DayBookmarkRepository dayBookmarkRepository;
+//    private final DayBookmarkRepository dayBookmarkRepository;
 
-    public BookmarkService(BookmarkRepository bookmarkRepository, UserRepository userRepository, DayBookmarkRepository dayBookmarkRepository) {
+    public BookmarkService(BookmarkRepository bookmarkRepository, UserRepository userRepository) { //DayBookmarkRepository dayBookmarkRepository
         this.bookmarkRepository = bookmarkRepository;
         this.userRepository = userRepository;
-        this.dayBookmarkRepository = dayBookmarkRepository;
+//        this.dayBookmarkRepository = dayBookmarkRepository;
     }
 
     public void addBookmark(BookmarkDTO bookmarkDTO) {
@@ -71,10 +71,10 @@ public class BookmarkService {
                 .orElseThrow(() -> new CustomException(1002, "Bookmark not found"));
 
         // 북마크 ID를 가져옵니다
-        Long bookmarkId = bookmarkEntity.getId();
+//        Long bookmarkId = bookmarkEntity.getId();
 
         // day_bookmark 테이블에서 해당 bookmark_id와 연결된 모든 레코드를 삭제
-        dayBookmarkRepository.deleteByBookmarkId(bookmarkId);
+//        dayBookmarkRepository.deleteByBookmarkId(bookmarkId);
 
         // 북마크 삭제
         bookmarkRepository.delete(bookmarkEntity);
