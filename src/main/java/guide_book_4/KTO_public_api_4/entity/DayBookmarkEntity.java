@@ -17,10 +17,10 @@ public class DayBookmarkEntity {
     @Id
     @ManyToOne
     @JoinColumn(name = "day_id", nullable = false)
-    private DayEntity day;
+    private DayEntity dayId;
 
     @Id
     @ManyToOne
     @JoinColumn(name = "bookmark_id", nullable = false)
-    private BookmarkEntity bookmark;
+    private BookmarkEntity bookmarkId;
 }
