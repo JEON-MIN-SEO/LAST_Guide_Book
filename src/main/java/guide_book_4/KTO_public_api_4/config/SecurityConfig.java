@@ -88,7 +88,7 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/join").permitAll()
+                        .requestMatchers("/login", "/join","/").permitAll()
                         .requestMatchers("/api/**","/api/guidebook/**","/api/guidebook/create","/api/guidebook/updateDays/**").authenticated()
                         .anyRequest().authenticated());
 
