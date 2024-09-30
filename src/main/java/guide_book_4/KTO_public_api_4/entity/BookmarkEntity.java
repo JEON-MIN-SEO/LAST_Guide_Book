@@ -47,7 +47,7 @@ public class BookmarkEntity {
     @Column(name = "tel")
     private String tel;
 
-    @Column(name = "overview")
+    @Column(name = "overview", length = 1000)
     private String overview;
 
     @Column(name = "eventStartDate")
