@@ -1,12 +1,14 @@
 package guide_book_4.KTO_public_api_4.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
 @Entity
 @Table(name = "day_bookmark")
+@Data
 @Getter
 @Setter
 public class DayBookmarkEntity {
