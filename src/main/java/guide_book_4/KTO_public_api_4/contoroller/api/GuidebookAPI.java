@@ -2,6 +2,7 @@ package guide_book_4.KTO_public_api_4.contoroller.api;
 
 import guide_book_4.KTO_public_api_4.dto.DayDTO;
 import guide_book_4.KTO_public_api_4.dto.GuidebookDTO;
+import guide_book_4.KTO_public_api_4.entity.GuidebookEntity;
 import guide_book_4.KTO_public_api_4.error.ApiResponse;
 import guide_book_4.KTO_public_api_4.error.CustomException;
 import guide_book_4.KTO_public_api_4.service.GuidebookService;
@@ -49,13 +50,13 @@ public class GuidebookAPI {
 
     // 3. 가이드북 생성
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<String>> createGuidebook(@RequestBody GuidebookDTO guidebookDTO) {
+    public ResponseEntity<ApiResponse<Long>> createGuidebook(@RequestBody GuidebookDTO guidebookDTO) {
         try {
-            guidebookService.createGuidebook(guidebookDTO);
-            ApiResponse<String> response = new ApiResponse<>("Guidebook created successfully");
+            GuidebookEntity guidebookEntity = guidebookService.createGuidebook(guidebookDTO);
+            ApiResponse<Long> response = new ApiResponse<>(guidebookEntity.getId());
             return ResponseEntity.ok(response);
         } catch (CustomException e) {
-            ApiResponse<String> errorResponse = new ApiResponse<>(e.getErrorCode(), e.getMessage());
+            ApiResponse<Long> errorResponse = new ApiResponse<>(e.getErrorCode(), e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }

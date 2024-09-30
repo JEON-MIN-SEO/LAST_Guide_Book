@@ -122,7 +122,7 @@ public class GuidebookService {
 
     // 3. 가이드북 생성 (시작일과 종료일을 기준으로 DayEntity를 생성)
     @Transactional
-    public void createGuidebook(GuidebookDTO guidebookDTO) {
+    public GuidebookEntity createGuidebook(GuidebookDTO guidebookDTO) {
         UserEntity user = userRepository.findById(guidebookDTO.getUserId())
                 .orElseThrow(() -> new CustomException(1001, "User not found"));
 
@@ -137,6 +137,8 @@ public class GuidebookService {
 
         // DayEntity 생성
         createDaysForGuidebook(guidebook);
+
+        return guidebook;
     }
 
     // 시작일과 종료일을 기준으로 DayEntity를 생성
