@@ -1,17 +1,19 @@
 package guide_book_4.KTO_public_api_4.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 
 @Entity
 @Table(name = "day_bookmark")
 @Getter
 @Setter
 public class DayBookmarkEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동으로 ID 생성
+    private Long id; // 기본 키 필드 추가
 
     @ManyToOne
     @JoinColumn(name = "day_id", nullable = false)
