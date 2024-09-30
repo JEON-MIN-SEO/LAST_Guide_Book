@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 
 @Entity
 @Table(name = "day_bookmark")
@@ -16,13 +15,11 @@ import org.springframework.data.annotation.Id;
 public class DayBookmarkEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동으로 ID 생성
-    private Long id; // 기본 키 필드 추가
-
     @ManyToOne
     @JoinColumn(name = "day_id", nullable = false)
     private DayEntity day;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "bookmark_id", nullable = false)
     private BookmarkEntity bookmark;
