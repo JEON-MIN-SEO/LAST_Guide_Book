@@ -1,5 +1,6 @@
 package guide_book_4.KTO_public_api_4.contoroller.api;
 
+import guide_book_4.KTO_public_api_4.dto.DayBookmarkDTO;
 import guide_book_4.KTO_public_api_4.dto.DayDTO;
 import guide_book_4.KTO_public_api_4.dto.GuidebookDTO;
 import guide_book_4.KTO_public_api_4.entity.GuidebookEntity;

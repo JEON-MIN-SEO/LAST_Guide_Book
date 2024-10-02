@@ -14,7 +14,7 @@ public class DayDTO {
 
     private int dayNumber;
 
-    private List<Long> bookmarkIds;
+    private List<Long> bookmarkIds; // 해당 일자에 연결될 북마크 ID 목록
 
     private List<BookmarkDTO> bookmarks;
 }

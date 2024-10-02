@@ -3,10 +3,11 @@ package guide_book_4.KTO_public_api_4.service;
 
 import guide_book_4.KTO_public_api_4.dto.BookmarkDTO;
 import guide_book_4.KTO_public_api_4.entity.BookmarkEntity;
+import guide_book_4.KTO_public_api_4.entity.DayBookmarkEntity;
 import guide_book_4.KTO_public_api_4.entity.UserEntity;
 import guide_book_4.KTO_public_api_4.error.CustomException;
 import guide_book_4.KTO_public_api_4.repository.BookmarkRepository;
-//import guide_book_4.KTO_public_api_4.repository.DayBookmarkRepository;
+import guide_book_4.KTO_public_api_4.repository.DayBookmarkRepository;
 import guide_book_4.KTO_public_api_4.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,12 @@ public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
-//    private final DayBookmarkRepository dayBookmarkRepository;
+    private final DayBookmarkRepository dayBookmarkRepository; // 추가
 
-    public BookmarkService(BookmarkRepository bookmarkRepository, UserRepository userRepository) { //DayBookmarkRepository dayBookmarkRepository
+    public BookmarkService(BookmarkRepository bookmarkRepository, UserRepository userRepository, DayBookmarkRepository dayBookmarkRepository) {
         this.bookmarkRepository = bookmarkRepository;
         this.userRepository = userRepository;
-//        this.dayBookmarkRepository = dayBookmarkRepository;
+        this.dayBookmarkRepository = dayBookmarkRepository; // 추가
     }
 
     public void addBookmark(BookmarkDTO bookmarkDTO) {
@@ -70,6 +71,16 @@ public class BookmarkService {
 
         BookmarkEntity bookmarkEntity = bookmarkRepository.findByUserIdAndContentId(userEntity, contentId)
                 .orElseThrow(() -> new CustomException(1002, "Bookmark not found"));
+
+        // day_bookmark에서 해당 북마크가 참조되고 있는지 확인
+        List<DayBookmarkEntity> dayBookmarks = dayBookmarkRepository.findByBookmarkId(bookmarkEntity.getId());
+
+        // 참조가 있을 경우, 해당 관계 삭제
+        if (!dayBookmarks.isEmpty()) {
+            for (DayBookmarkEntity dayBookmark : dayBookmarks) {
+                dayBookmarkRepository.delete(dayBookmark); // 참조 삭제
+            }
+        }
 
         // 북마크 삭제
         bookmarkRepository.delete(bookmarkEntity);

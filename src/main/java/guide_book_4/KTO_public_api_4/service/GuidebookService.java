@@ -1,17 +1,12 @@
 package guide_book_4.KTO_public_api_4.service;
 
 import guide_book_4.KTO_public_api_4.dto.BookmarkDTO;
+import guide_book_4.KTO_public_api_4.dto.DayBookmarkDTO;
 import guide_book_4.KTO_public_api_4.dto.DayDTO;
 import guide_book_4.KTO_public_api_4.dto.GuidebookDTO;
-import guide_book_4.KTO_public_api_4.entity.BookmarkEntity;
-import guide_book_4.KTO_public_api_4.entity.DayEntity;
-import guide_book_4.KTO_public_api_4.entity.GuidebookEntity;
-import guide_book_4.KTO_public_api_4.entity.UserEntity;
+import guide_book_4.KTO_public_api_4.entity.*;
 import guide_book_4.KTO_public_api_4.error.CustomException;
-import guide_book_4.KTO_public_api_4.repository.BookmarkRepository;
-import guide_book_4.KTO_public_api_4.repository.DayRepository;
-import guide_book_4.KTO_public_api_4.repository.GuidebookRepository;
-import guide_book_4.KTO_public_api_4.repository.UserRepository;
+import guide_book_4.KTO_public_api_4.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +23,16 @@ public class GuidebookService {
     private final DayRepository dayRepository;
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
+    private final DayBookmarkRepository dayBookmarkRepository;
 
     public GuidebookService(GuidebookRepository guidebookRepository, DayRepository dayRepository,
-                            BookmarkRepository bookmarkRepository,UserRepository userRepository) {
+                            BookmarkRepository bookmarkRepository,UserRepository userRepository,
+                            DayBookmarkRepository dayBookmarkRepository) {
         this.guidebookRepository = guidebookRepository;
         this.dayRepository = dayRepository;
         this.bookmarkRepository = bookmarkRepository;
         this.userRepository = userRepository;
+        this.dayBookmarkRepository = dayBookmarkRepository;
     }
 
     // 1. 가이드북 조회
@@ -93,9 +91,9 @@ public class GuidebookService {
         dayDTO.setId(day.getId());
         dayDTO.setDayNumber(day.getDayNumber());
 
-        // 북마크 ID로 북마크 정보를 가져오고 DTO로 변환
-        List<BookmarkDTO> bookmarkDTOs = day.getBookmarks().stream()
-                .map(bookmark -> convertBookmarkToDTO(bookmark))
+        // DayBookmarkEntity를 통해 BookmarkEntity 가져오기
+        List<BookmarkDTO> bookmarkDTOs = day.getDayBookmarks().stream()
+                .map(dayBookmark -> convertBookmarkToDTO(dayBookmark.getBookmark()))
                 .collect(Collectors.toList());
 
         dayDTO.setBookmarks(bookmarkDTOs);
@@ -178,7 +176,16 @@ public class GuidebookService {
 
             // bookmarkIds를 사용하여 BookmarkEntity를 가져온다
             List<BookmarkEntity> bookmarks = bookmarkRepository.findAllById(dayDTO.getBookmarkIds());
-            dayEntity.setBookmarks(bookmarks);
+
+            // 기존 DayBookmarkEntity를 삭제하고 새로 추가
+            dayEntity.getDayBookmarks().clear(); // 기존 DayBookmarkEntity 제거
+            for (BookmarkEntity bookmark : bookmarks) {
+                DayBookmarkEntity dayBookmarkEntity = new DayBookmarkEntity();
+                dayBookmarkEntity.setDay(dayEntity); // 연결
+                dayBookmarkEntity.setBookmark(bookmark); // 연결
+                dayEntity.getDayBookmarks().add(dayBookmarkEntity); // 추가
+            }
+
             dayRepository.save(dayEntity);
         }
     }
