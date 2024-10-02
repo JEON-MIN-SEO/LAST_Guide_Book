@@ -8,6 +8,7 @@ import guide_book_4.KTO_public_api_4.error.CustomException;
 import guide_book_4.KTO_public_api_4.repository.BookmarkRepository;
 //import guide_book_4.KTO_public_api_4.repository.DayBookmarkRepository;
 import guide_book_4.KTO_public_api_4.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,7 +62,7 @@ public class BookmarkService {
         bookmarkRepository.save(bookmarkEntity);
     }
 
-
+    @Transactional
     public void deleteBookmark(Long userId, String contentId) {
         // 유저와 북마크가 존재하는지 확인
         UserEntity userEntity = userRepository.findById(userId)
@@ -69,12 +70,6 @@ public class BookmarkService {
 
         BookmarkEntity bookmarkEntity = bookmarkRepository.findByUserIdAndContentId(userEntity, contentId)
                 .orElseThrow(() -> new CustomException(1002, "Bookmark not found"));
-
-        // 북마크 ID를 가져옵니다
-//        Long bookmarkId = bookmarkEntity.getId();
-
-        // day_bookmark 테이블에서 해당 bookmark_id와 연결된 모든 레코드를 삭제
-//        dayBookmarkRepository.deleteByBookmarkId(bookmarkId);
 
         // 북마크 삭제
         bookmarkRepository.delete(bookmarkEntity);

@@ -76,7 +76,7 @@ public class GuidebookAPI {
 
     // 5. 가이드북 삭제
     @DeleteMapping("/{guidebookId}")
-    public ResponseEntity<ApiResponse<String>> deleteGuidebook(@PathVariable Long guidebookId) {
+    public ResponseEntity<ApiResponse<String>> deleteGuidebook(@PathVariable("guidebookId") Long guidebookId) {
         try {
             guidebookService.deleteGuidebook(guidebookId);
             ApiResponse<String> response = new ApiResponse<>("Guidebook deleted successfully");
