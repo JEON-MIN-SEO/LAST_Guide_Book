@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//git branch checkout
-
 //CRUD 「作成（Create）」「読み出し（Read）」「更新（Update）」「削除（Delete）」
 @RestController
 @RequestMapping("/api/bookmark")
