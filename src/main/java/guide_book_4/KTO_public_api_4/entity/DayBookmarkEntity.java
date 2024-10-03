@@ -16,6 +16,7 @@ import lombok.Setter;
 public class DayBookmarkEntity {
 
     @EmbeddedId
+    @Id
     private DayBookmarkId id;
 
     @ManyToOne
