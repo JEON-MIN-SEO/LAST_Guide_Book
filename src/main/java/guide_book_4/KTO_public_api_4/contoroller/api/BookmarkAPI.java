@@ -58,18 +58,18 @@ public class BookmarkAPI {
         }
     }
 
-//    // 특정 가이드북에 있는 북마크 조회
-//    @GetMapping("/guidebook/{guidebookId}")
-//    public ResponseEntity<ApiResponse<List<BookmarkDTO>>> getGuidebookBookmarks(@PathVariable Long guidebookId) {
-//        try {
-//            List<BookmarkDTO> bookmarks = bookmarkService.getGuidebookBookmarks(guidebookId);
-//            ApiResponse<List<BookmarkDTO>> response = new ApiResponse<>(bookmarks);
-//            return ResponseEntity.ok(response);
-//        } catch (CustomException e) {
-//            ApiResponse<List<BookmarkDTO>> errorResponse = new ApiResponse<>(e.getErrorCode(), e.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-//        }
-//    }
+    // 특정 가이드북에 있는 북마크 조회
+    @GetMapping("/guidebook/{guidebookId}")
+    public ResponseEntity<ApiResponse<List<BookmarkDTO>>> getGuidebookBookmarks(@PathVariable Long guidebookId) {
+        try {
+            List<BookmarkDTO> bookmarks = bookmarkService.getGuidebookBookmarks(guidebookId);
+            ApiResponse<List<BookmarkDTO>> response = new ApiResponse<>(bookmarks);
+            return ResponseEntity.ok(response);
+        } catch (CustomException e) {
+            ApiResponse<List<BookmarkDTO>> errorResponse = new ApiResponse<>(e.getErrorCode(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
 }
 
 
